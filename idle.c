@@ -13,11 +13,8 @@
 
 #include <trace/events/power.h>
 
-#ifdef CONFIG_SCHED_BFS
-#include "bfs_sched.h"
-#else
+#include "wrapper_sched.h"
 #include "sched.h"
-#endif
 
 /**
  * sched_idle_set_state - Record idle state for the current CPU.

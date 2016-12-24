@@ -23,6 +23,7 @@
 static DEFINE_SPINLOCK(kthread_create_lock);
 static LIST_HEAD(kthread_create_list);
 struct task_struct *kthreadd_task;
+extern int sch_alg;
 
 struct kthread_create_info
 {
@@ -321,6 +322,10 @@ struct task_struct *kthread_create_on_node(int (*threadfn)(void *data),
 		 * The kernel thread should not inherit these properties.
 		 */
 		sched_setscheduler_nocheck(task, SCHED_NORMAL, &param);
+		if (sch_alg == 0)
+			task->origin_sched = 1;
+		else
+			task->origin_sched = 2;
 		set_cpus_allowed_ptr(task, cpu_all_mask);
 	}
 	kfree(create);

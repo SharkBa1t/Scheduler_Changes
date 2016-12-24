@@ -6,6 +6,8 @@
 
 #include <asm/nops.h>
 
+//static int abhishek;
+extern int sch_alg;
 static inline void native_clts(void)
 {
 	asm volatile("clts");
@@ -53,7 +55,23 @@ static inline unsigned long native_read_cr3(void)
 
 static inline void native_write_cr3(unsigned long val)
 {
+	if (sch_alg == 1)
+	{
+		/*if (abhishek < 20)
+		{
+			printk(KERN_ALERT "In %s at [%d] of %s - Abhishek - %ld\n",__func__,__LINE__,__FILE__,val);
+			abhishek++;
+		}*/
+	}
 	asm volatile("mov %0,%%cr3": : "r" (val), "m" (__force_order));
+	if (sch_alg == 1)
+	{
+		/*if (abhishek < 20)
+		{
+			printk(KERN_ALERT "In %s at [%d] of %s - Abhishek - %ld\n",__func__,__LINE__,__FILE__,val);
+			abhishek++;
+		}*/
+	}
 }
 
 static inline unsigned long native_read_cr4(void)

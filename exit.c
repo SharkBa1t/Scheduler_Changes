@@ -61,6 +61,8 @@
 
 static void exit_mm(struct task_struct *tsk);
 
+extern int sch_alg;
+
 static void __unhash_process(struct task_struct *p, bool group_dead)
 {
 	nr_threads--;
@@ -135,7 +137,10 @@ static void __exit_signal(struct task_struct *tsk)
 	sig->inblock += task_io_get_inblock(tsk);
 	sig->oublock += task_io_get_oublock(tsk);
 	task_io_accounting_add(&sig->ioac, &tsk->ioac);
-	sig->sum_sched_runtime += tsk_seruntime(tsk);
+	if (sch_alg == 0)
+		sig->sum_sched_runtime += tsk->se.sum_exec_runtime;
+	else if (sch_alg == 1)
+		sig->sum_sched_runtime += tsk_seruntime(tsk);
 	sig->nr_threads--;
 	__unhash_process(tsk, group_dead);
 	write_sequnlock(&sig->stats_lock);
@@ -753,7 +758,6 @@ void do_exit(long code)
 	 * because of cgroup mode, must be called before cgroup_exit()
 	 */
 	perf_event_exit_task(tsk);
-
 	cgroup_exit(tsk);
 
 	/*

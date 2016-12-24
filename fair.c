@@ -527,7 +527,14 @@ static void __dequeue_entity(struct cfs_rq *cfs_rq, struct sched_entity *se)
 		next_node = rb_next(&se->run_node);
 		cfs_rq->rb_leftmost = next_node;
 	}
-
+	if (RB_EMPTY_NODE($se->run_node)) {
+		printk(KERN_ALERT "This shouldn't happen\n");
+		return;
+	}
+	if (RB_EMPTY_ROOT(&cfs_rq->tasks_timeline)) {
+		printk(KERN_ALERT "This shouldn't happen\n");
+		return;
+	}
 	rb_erase(&se->run_node, &cfs_rq->tasks_timeline);
 }
 
@@ -3095,6 +3102,9 @@ check_preempt_tick(struct cfs_rq *cfs_rq, struct sched_entity *curr)
 		return;
 
 	se = __pick_first_entity(cfs_rq);
+	if (!se)
+		return;
+
 	delta = curr->vruntime - se->vruntime;
 
 	if (delta < 0)
